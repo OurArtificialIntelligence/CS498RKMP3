@@ -186,7 +186,8 @@ router.put('/users/:id', function(reg, res){
         data: []
       });
     } else {
-      blog.findByIdAndUpdate(reg.params.id, blogpost, function(err, blogs) {
+      blog.findByIdAndUpdate(reg.params.id, blogpost,
+                            {new: true},  function(err, user) {
         if(err) {
           res.status(404).send({
             message: err,
@@ -194,7 +195,8 @@ router.put('/users/:id', function(reg, res){
           });
         } else {
           res.status(200).send({
-            message: 'OK'
+            message: 'O2K',
+            data: user
           });
         }
       });
@@ -388,7 +390,7 @@ router.put('/tasks/:id', function(reg, res){
     taskinfo.assignedUserName = reg.body.assignedUserName;
   }
 
-  comment.findByIdAndUpdate(reg.params.id, taskinfo, function(err, blogs) {
+  comment.findByIdAndUpdate(reg.params.id, taskinfo, {new: true}, function(err, blogs) {
      if(err) {
        res.status(404).send({
          message: err,
