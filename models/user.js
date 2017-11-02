@@ -1,10 +1,14 @@
-// Load required packages
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    pendingTasks = require('./pendingTask');
 
-// Define our user schema
-var UserSchema = new mongoose.Schema({
-    name: String
+var userSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    dateCreated: {type: Date, default: Date.now},
+    pendingTasks: [{
+      type: String,
+      ref: "pendingTasks"
+    }]
 });
 
-// Export the Mongoose model
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('user', userSchema);
