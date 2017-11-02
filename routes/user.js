@@ -194,8 +194,7 @@ router.put('/users/:id', function(reg, res){
           });
         } else {
           res.status(200).send({
-            message: 'OK',
-            data: blogs
+            message: 'OK'
           });
         }
       });
