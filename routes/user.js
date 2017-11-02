@@ -76,17 +76,68 @@ router.post('/users', function(reg, res){
 });
 
 router.get('/users/:id', function(req, res){
-  blog.findById(req.params.id, function(err, user) {
+  var where = isJson(req.query.where);
+  var sort = isJson(req.query.sort);
+  var select = isJson(req.query.select);
+  var skip = isJson(req.query.skip);
+  var limit = isJson(req.query.limit);
+  var count = req.query.count;
+  //
+  // blog.findById(req.params.id, function(err, user) {
+  //   if(count == '' || count == null || count == "false"){
+  //     var ret = user.find(where).select(select).sort(sort).skip(skip).limit(limit);
+  //   } else {
+  //     var ret = user.find(where).select(select).sort(sort).skip(skip).limit(limit).count();
+  //   }
+  //
+  //   if(err) {
+  //     res.status(404).send({
+  //       messag: err,
+  //       data: [],
+  //     });
+  //   } else {
+  //     res.status(200).send({
+  //       message: 'OK',
+  //       data: ret,
+  //       where: where,
+  //       sort: sort,
+  //       select: select,
+  //       skip: skip,
+  //       limit: limit,
+  //       count: count
+  //     });
+  //   }
+  // });
+
+  if(count == '' || count == null || count == "false"){
+    var ret = blog.findById(req.params.id).find(where).select(select).sort(sort).skip(skip).limit(limit);
+  } else {
+    var ret = blog.findById(req.params.id).find(where).select(select).sort(sort).skip(skip).limit(limit).count();
+  }
+  ret.exec(function(err, blogs) {
     if(err) {
-      res.status(404).send({
-        messag: err,
+      res.status(500).send({
+        message: err,
         data: []
       });
     } else {
-      res.status(200).send({
-        message: 'OK',
-        data: user
-      });
+      if(blogs.data == null){
+        res.status(404).send({
+          message: 'User not found.',
+          data: blogs
+        });
+      } else {
+        res.status(200).send({
+          message: 'OK',
+          data: blogs,
+          where: where,
+          sort: sort,
+          select: select,
+          skip: skip,
+          limit: limit,
+          count: count
+        });
+      }
     }
   });
 });
@@ -113,7 +164,7 @@ router.put('/users/:id', function(reg, res){
         data: []
       });
     } else {
-      res.status(201).send({
+      res.status(200).send({
         message: 'OK',
         data: blogs
       });
@@ -124,17 +175,24 @@ router.put('/users/:id', function(reg, res){
 //users/:id DELETE
 router.delete('/users/:id', function(req, res){
  blog.findByIdAndRemove(req.params.id, function(err, blogs){
-  if(err) {
-            res.status(404).send({
-               message: err,
-               data: []
-            });
-        }else{
-            res.status(201).send({
-                message: 'resource deleted',
-                data: []
-            });
-        }
+  if(err){
+    res.status(404).send({
+       message: err,
+       data: []
+    });
+    } else {
+      if(blogs == null){
+        res.status(404).send({
+          message: 'User not found.',
+          data: blogs
+        });
+      } else {
+        res.status(200).send({
+            message: 'resource deleted',
+            data: blogs
+        });
+       }
+      }
     });
  });
 
@@ -199,6 +257,13 @@ router.post('/tasks', function(reg, res){
     assignedUserName: reg.body.assignedUserName,
   };
 
+  if(taskinfo.name == null || taskinfo.deadline == null || taskinfo.name == "" || taskinfo.deadline == ""){
+    res.status(500).send({
+      message: "Task name or deadline cannot be null.",
+    });
+    return;
+  }
+
   comment.create(taskinfo, function(err, task) {
     if(err) {
       res.status(500).send({
@@ -222,10 +287,16 @@ router.delete('/tasks/:id', function(req, res){
                data: []
             });
         }else{
+          if(tasks == null){
+            res.status(404).send({
+              message: 'Task not found.',
+            });
+          } else {
             res.status(201).send({
                 message: 'resource deleted',
-                data: []
+                data: tasks
             });
+          }
         }
     });
  });
@@ -238,10 +309,16 @@ router.delete('/tasks/:id', function(req, res){
          data: []
        });
      } else {
-       res.status(200).send({
-         message: 'OK',
-         data: task
-       });
+       if(task == null){
+         res.status(404).send({
+           message: 'Task not found.',
+         });
+       } else {
+         res.status(200).send({
+           message: 'OK',
+           data: task
+         });
+       }
      }
    });
  });
@@ -256,6 +333,13 @@ router.put('/tasks/:id', function(reg, res){
     assignedUserName: reg.body.assignedUserName,
   };
 
+  if(taskinfo.name == null || taskinfo.deadline == null || taskinfo.name == "" || taskinfo.deadline == ""){
+    res.status(500).send({
+      message: "Task name or deadline cannot be null.",
+    });
+    return;
+  }
+
    comment.findByIdAndUpdate(reg.params.id, taskinfo, function(err, blogs) {
      if(err) {
        res.status(404).send({
@@ -263,7 +347,7 @@ router.put('/tasks/:id', function(reg, res){
          data: []
        });
      } else {
-       res.status(201).send({
+       res.status(200).send({
          message: 'OK',
          data: blogs
        });
@@ -316,6 +400,7 @@ router.get('/users', function(req, res){
   } else {
     var ret = blog.find(where).select(select).sort(sort).skip(skip).limit(limit).count();
   }
+
   ret.exec(function(err, blogs) {
     if(err) {
       res.status(500).send({
