@@ -121,14 +121,14 @@ router.get('/users/:id', function(req, res){
         data: []
       });
     } else {
-      if(blogs == null){
+      if(blogs == null || blogs == ''){
         res.status(404).send({
           message: 'User not found.',
           data: blogs
         });
       } else {
         res.status(200).send({
-          message: 'OK',
+          message: 'OK1',
           data: blogs,
           where: where,
           sort: sort,
