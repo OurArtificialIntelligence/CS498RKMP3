@@ -39,6 +39,7 @@ router.post('/users', function(reg, res){
   var blogpost = {
     name: reg.body.name,
     email: reg.body.email,
+    pendingTasks: []
   };
 
   if(blogpost.name == null || blogpost.email == null || blogpost.email == "" || blogpost.name == ""){
