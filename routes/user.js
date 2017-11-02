@@ -128,7 +128,7 @@ router.get('/users/:id', function(req, res){
         });
       } else {
         res.status(200).send({
-          message: 'OK1',
+          message: 'OK',
           data: blogs[0],
           where: where,
           sort: sort,
@@ -163,16 +163,40 @@ router.put('/users/:id', function(reg, res){
                                         pendingTasks: pendingTasks
                                       };
 
-  blog.findByIdAndUpdate(reg.params.id, blogpost, function(err, blogs) {
-    if(err) {
-      res.status(404).send({
-        message: err,
+  // blog.findByIdAndUpdate(reg.params.id, blogpost, function(err, blogs) {
+  //   if(err) {
+  //     res.status(404).send({
+  //       message: err,
+  //       data: []
+  //     });
+  //   } else {
+  //     res.status(200).send({
+  //       message: 'OK',
+  //       data: blogs
+  //     });
+  //   }
+  // });
+
+  blog.findOne({'email': blogpost.email }).count().exec(function(err, num){
+    if(parseInt(num) != 0){
+      res.status(500).send({
+        message: "Email already exist.",
+        num: parseInt(num),
         data: []
       });
     } else {
-      res.status(200).send({
-        message: 'OK',
-        data: blogs
+      blog.findByIdAndUpdate(reg.params.id, blogpost, function(err, blogs) {
+        if(err) {
+          res.status(404).send({
+            message: err,
+            data: []
+          });
+        } else {
+          res.status(200).send({
+            message: 'OK',
+            data: blogs
+          });
+        }
       });
     }
   });
