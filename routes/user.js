@@ -128,8 +128,8 @@ router.get('/users/:id', function(req, res){
         });
       } else {
         res.status(200).send({
-          message: 'OK1',
-          data: blogs,
+          message: 'OK',
+          data: blogs[0],
           where: where,
           sort: sort,
           select: select,
@@ -294,7 +294,7 @@ router.delete('/tasks/:id', function(req, res){
           } else {
             res.status(200).send({
                 message: 'resource deleted',
-                data: tasks
+                data: tasks[0]
             });
           }
         }
