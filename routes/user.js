@@ -128,7 +128,7 @@ router.get('/users/:id', function(req, res){
         });
       } else {
         res.status(200).send({
-          message: 'OK',
+          message: 'OK1',
           data: blogs[0],
           where: where,
           sort: sort,
@@ -143,19 +143,25 @@ router.get('/users/:id', function(req, res){
 });
 
 router.put('/users/:id', function(reg, res){
-  var blogpost = {
-    name: reg.body.name,
-    email: reg.body.email,
-    pendingTasks: reg.body.pendingTasks
-  };
+  var name = reg.body.name;
+  var email = reg.body.email;
+  var pendingTasks = reg.body.pendingTasks;
 
-  if(blogpost.name == null || blogpost.email == null || blogpost.email == "" || blogpost.name == ""){
+  if(name == null || email == null || email == "" || name == ""){
     res.status(500).send({
       message: "Email or Name cannot be null",
-      data: []
     });
     return;
   }
+
+  var blogpost = pendingTasks == "" || pendingTasks == null ? {
+                                        name: name,
+                                        email: email
+                                      } : {
+                                        name: name,
+                                        email: email,
+                                        pendingTasks: pendingTasks
+                                      };
 
   blog.findByIdAndUpdate(reg.params.id, blogpost, function(err, blogs) {
     if(err) {
@@ -294,7 +300,7 @@ router.delete('/tasks/:id', function(req, res){
           } else {
             res.status(200).send({
                 message: 'resource deleted',
-                data: tasks[0]
+                data: tasks
             });
           }
         }
@@ -324,23 +330,41 @@ router.delete('/tasks/:id', function(req, res){
  });
 
 router.put('/tasks/:id', function(reg, res){
-  var taskinfo = {
-    name: reg.body.name,
-    description: reg.body.description,
-    deadline: reg.body.deadline,
-    completed: reg.body.completed,
-    assignedUser: reg.body.assignedUser,
-    assignedUserName: reg.body.assignedUserName,
-  };
 
-  if(taskinfo.name == null || taskinfo.deadline == null || taskinfo.name == "" || taskinfo.deadline == ""){
+  var data = reg.body;
+  if(data.name == null || data.deadline == null || data.name == "" || data.deadline == ""){
     res.status(500).send({
       message: "Task name or deadline cannot be null.",
     });
     return;
   }
 
-   comment.findByIdAndUpdate(reg.params.id, taskinfo, function(err, blogs) {
+  var taskinfo = {
+    name: data.name,
+    //description: reg.body.description,
+    deadline: data.deadline
+    // completed: reg.body.completed,
+    // assignedUser: reg.body.assignedUser,
+    // assignedUserName: reg.body.assignedUserName,
+  };
+
+  if("description" in data){
+    taskinfo.description = reg.body.description;
+  }
+
+  if("completed" in data){
+    taskinfo.completed = reg.body.completed;
+  }
+
+  if("assignedUser" in data){
+    taskinfo.assignedUser = reg.body.assignedUser;
+  }
+
+  if("assignedUserName" in data){
+    taskinfo.assignedUserName = reg.body.assignedUserName;
+  }
+
+  comment.findByIdAndUpdate(reg.params.id, taskinfo, function(err, blogs) {
      if(err) {
        res.status(404).send({
          message: err,
