@@ -121,7 +121,7 @@ router.get('/users/:id', function(req, res){
         data: []
       });
     } else {
-      if(blogs.data == null){
+      if(blogs == null){
         res.status(404).send({
           message: 'User not found.',
           data: blogs
@@ -292,7 +292,7 @@ router.delete('/tasks/:id', function(req, res){
               message: 'Task not found.',
             });
           } else {
-            res.status(201).send({
+            res.status(200).send({
                 message: 'resource deleted',
                 data: tasks
             });
